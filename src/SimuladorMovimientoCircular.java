@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+
 public class SimuladorMovimientoCircular extends JFrame implements ActionListener {
     private JPanel panelIzquierdo, panelDerecho;
     private JButton startButton, stopButton, resetButton;
