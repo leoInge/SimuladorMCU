@@ -8,7 +8,7 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
     private JButton startButton, stopButton, resetButton;
     private JTextField radioField, periodoField, masaField;
     private JComboBox<String> opcionesComboBox;
-    private JLabel posicionXLabel, posicionYLabel;
+    private JLabel posicionXLabel, posicionYLabel, velocidadLabel, velocidadXLabel, velocidadYLabel;
     private Timer timer;
     private double radio, periodo, masa;
     private int centerX, centerY;
@@ -50,6 +50,9 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
         // Etiquetas para las coordenadas X & Y
         posicionXLabel = new JLabel("Posición en X: ");
         posicionYLabel = new JLabel("Posición en Y: ");
+        velocidadLabel = new JLabel("Velocidad: ");
+        velocidadXLabel = new JLabel("Velocidad en X: ");
+        velocidadYLabel = new JLabel("Velocidad en Y: ");
 
         // Campos de texto
         radioField = new JTextField(10);
@@ -69,6 +72,9 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
         panelIzquierdo.add(resetButton);
         panelIzquierdo.add(posicionXLabel);
         panelIzquierdo.add(posicionYLabel);
+        panelIzquierdo.add(velocidadLabel);
+        panelIzquierdo.add(velocidadXLabel);
+        panelIzquierdo.add(velocidadYLabel);
 
         add(panelIzquierdo, BorderLayout.WEST);
         add(panelDerecho, BorderLayout.CENTER);
@@ -130,6 +136,16 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
         double posY = centerY - y;
         posicionXLabel.setText("Posición en X: " + posX);
         posicionYLabel.setText("Posición en Y: " + posY);
+
+        // Calcular velocidad tangencial
+        double velocidadTangencial = radio * (2 * Math.PI / periodo);
+
+        // Calcular y mostrar la velocidad y sus componentes en el panel izquierdo
+        velocidadLabel.setText("Velocidad: " + velocidadTangencial);
+        double velocidadX = velocidadTangencial * Math.cos(angle);
+        double velocidadY = velocidadTangencial * Math.sin(angle);
+        velocidadXLabel.setText("Velocidad en X: " + velocidadX);
+        velocidadYLabel.setText("Velocidad en Y: " + velocidadY);
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -154,6 +170,12 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
             periodoField.setText("");
             masaField.setText("");
             timer.stop();
+        } else if (e.getSource() == opcionesComboBox) {
+            String selectedOption = (String) opcionesComboBox.getSelectedItem();
+            if (selectedOption.equals("Velocidad")) {
+                double velocidadTangencial = radio * (2 * Math.PI / periodo);
+                JOptionPane.showMessageDialog(this, "La velocidad tangencial es: " + velocidadTangencial);
+            }
         }
 
         if (e.getSource() == timer) {
