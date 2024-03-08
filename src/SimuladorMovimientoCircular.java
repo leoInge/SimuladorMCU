@@ -3,19 +3,22 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-
 public class SimuladorMovimientoCircular extends JFrame implements ActionListener {
     private JPanel panelIzquierdo, panelDerecho;
     private JButton startButton, stopButton, resetButton;
     private JTextField radioField, periodoField, masaField;
+    private JComboBox<String> opcionesComboBox;
+    private JLabel posicionXLabel, posicionYLabel;
     private Timer timer;
     private double radio, periodo, masa;
     private int centerX, centerY;
     private double angle = 0;
+    private static final int PANEL_WIDTH = 600; // Ancho fijo del panel derecho
+    private static final int PANEL_HEIGHT = 600; // Altura fija del panel derecho
 
     public SimuladorMovimientoCircular() {
         setTitle("Simulador de Movimiento Circular Uniforme");
-        setSize(800, 600);
+        setSize(1000, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -30,6 +33,7 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
                 dibujarCirculo(g);
             }
         };
+        panelDerecho.setPreferredSize(new Dimension(PANEL_WIDTH, PANEL_HEIGHT)); // Establecer tamaño del panel derecho
 
         // Botones
         startButton = new JButton("Iniciar");
@@ -38,6 +42,14 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
         stopButton.addActionListener(this);
         resetButton = new JButton("Resetear");
         resetButton.addActionListener(this);
+
+        // Lista desplegable de opciones
+        opcionesComboBox = new JComboBox<>(new String[]{"Posición", "Velocidad", "Aceleración", "Fuerza"});
+        opcionesComboBox.addActionListener(this);
+
+        // Etiquetas para las coordenadas X & Y
+        posicionXLabel = new JLabel("Posición en X: ");
+        posicionYLabel = new JLabel("Posición en Y: ");
 
         // Campos de texto
         radioField = new JTextField(10);
@@ -51,9 +63,12 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
         panelIzquierdo.add(periodoField);
         panelIzquierdo.add(new JLabel("Masa (kg): "));
         panelIzquierdo.add(masaField);
+        panelIzquierdo.add(opcionesComboBox);
         panelIzquierdo.add(startButton);
         panelIzquierdo.add(stopButton);
         panelIzquierdo.add(resetButton);
+        panelIzquierdo.add(posicionXLabel);
+        panelIzquierdo.add(posicionYLabel);
 
         add(panelIzquierdo, BorderLayout.WEST);
         add(panelDerecho, BorderLayout.CENTER);
@@ -70,8 +85,8 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
     }
 
     private void dibujarPlanoCartesiano(Graphics g) {
-        int width = panelDerecho.getWidth();
-        int height = panelDerecho.getHeight();
+        int width = PANEL_WIDTH;
+        int height = PANEL_HEIGHT;
         int divisiones = 10; // Número de divisiones en el plano cartesiano
 
         g.setColor(Color.LIGHT_GRAY);
@@ -102,9 +117,19 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
         double x = centerX + radio * Math.cos(angle);
         double y = centerY - radio * Math.sin(angle); // Usar resta para invertir el eje y
 
+        // Limitar las coordenadas dentro del radio especificado
+        x = Math.max(Math.min(x, centerX + radio), centerX - radio);
+        y = Math.max(Math.min(y, centerY + radio), centerY - radio);
+
         // Dibujar el círculo en la nueva posición
         g.setColor(Color.RED);
         g.fillOval((int) (x - masa / 2), (int) (y - masa / 2), (int) masa, (int) masa);
+
+        // Calcular y mostrar las coordenadas en el panel izquierdo
+        double posX = x - centerX;
+        double posY = centerY - y;
+        posicionXLabel.setText("Posición en X: " + posX);
+        posicionYLabel.setText("Posición en Y: " + posY);
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -118,8 +143,8 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
                 return;
             }
 
-            centerX = panelDerecho.getWidth() / 2;
-            centerY = panelDerecho.getHeight() / 2;
+            centerX = PANEL_WIDTH / 2;
+            centerY = PANEL_HEIGHT / 2;
 
             timer.start();
         } else if (e.getSource() == stopButton) {
@@ -137,12 +162,15 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
             double x = centerX + radio * Math.cos(angle);
             double y = centerY - radio * Math.sin(angle); // Restamos el término para invertir el eje y
 
+            // Limitar las coordenadas dentro del radio especificado
+            x = Math.max(Math.min(x, centerX + radio), centerX - radio);
+            y = Math.max(Math.min(y, centerY + radio), centerY - radio);
+
             // Dibujar el círculo en la nueva posición
             Graphics g = panelDerecho.getGraphics();
             g.setColor(Color.WHITE);
-            g.fillRect(0, 0, panelDerecho.getWidth(), panelDerecho.getHeight());
-            g.setColor(Color.RED);
-            g.fillOval((int) (x - masa / 2), (int) (y - masa / 2), (int) masa, (int) masa);
+            g.fillRect(0, 0, PANEL_WIDTH, PANEL_HEIGHT);
+            dibujarCirculo(g);
 
             // Actualizar el ángulo para el siguiente frame
             panelDerecho.repaint();
@@ -154,8 +182,3 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
         SwingUtilities.invokeLater(() -> new SimuladorMovimientoCircular());
     }
 }
-
-
-
-
-
