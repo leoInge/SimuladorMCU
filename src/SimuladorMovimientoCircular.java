@@ -7,7 +7,6 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
     private JPanel panelIzquierdo, panelDerecho;
     private JButton startButton, stopButton, resetButton;
     private JTextField radioField, periodoField, masaField;
-    private JComboBox<String> opcionesComboBox;
     private JLabel posicionXLabel, posicionYLabel, velocidadLabel, velocidadXLabel, velocidadYLabel, aceleracionLabel, aceleracionXLabel, aceleracionYLabel;
     private JLabel fuerzaCentripetaLabel, fuerzaXLabel, fuerzaYLabel;
     private Timer timer;
@@ -44,10 +43,6 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
         resetButton = new JButton("Resetear");
         resetButton.addActionListener(this);
 
-        // Lista desplegable de opciones
-        opcionesComboBox = new JComboBox<>(new String[]{"Posición", "Velocidad", "Aceleración", "Fuerza"});
-        opcionesComboBox.addActionListener(this);
-
         // Etiquetas para las coordenadas X & Y
         posicionXLabel = new JLabel("Posición en X: ");
         posicionYLabel = new JLabel("Posición en Y: ");
@@ -75,7 +70,6 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
         panelIzquierdo.add(periodoField);
         panelIzquierdo.add(new JLabel("Masa (kg): "));
         panelIzquierdo.add(masaField);
-        panelIzquierdo.add(opcionesComboBox);
         panelIzquierdo.add(startButton);
         panelIzquierdo.add(stopButton);
         panelIzquierdo.add(resetButton);
@@ -108,28 +102,36 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
     private void dibujarPlanoCartesiano(Graphics g) {
         int width = PANEL_WIDTH;
         int height = PANEL_HEIGHT;
-        int divisiones = 10; // Número de divisiones en el plano cartesiano
+        int divisiones = 30; // Número de divisiones en el plano cartesiano
+        int maxValor = 300;
+        int minValor = -300;
 
         g.setColor(Color.LIGHT_GRAY);
 
-        // Dibujar líneas horizontales
+        // Dibujar líneas horizontales y etiquetas en el eje Y
         int deltaY = height / divisiones;
         for (int i = 1; i < divisiones; i++) {
             int y = i * deltaY;
             g.drawLine(0, y, width, y);
+            int labelY = maxValor - i * 20;
+            g.drawString(Integer.toString(labelY), 5, y + 5);
         }
 
-        // Dibujar líneas verticales
+        // Dibujar líneas verticales y etiquetas en el eje X
         int deltaX = width / divisiones;
         for (int i = 1; i < divisiones; i++) {
             int x = i * deltaX;
             g.drawLine(x, 0, x, height);
+            int labelX = minValor + i * 20;
+            g.drawString(Integer.toString(labelX), x - 10, height - 5);
         }
 
         // Dibujar ejes X y Y
         g.setColor(Color.BLACK);
-        g.drawLine(0, height / 2, width, height / 2); // Eje X
-        g.drawLine(width / 2, 0, width / 2, height); // Eje Y
+        int midX = width / 2;
+        int midY = height / 2;
+        g.drawLine(midX, 0, midX, height); // Eje Y
+        g.drawLine(0, midY, width, midY); // Eje X
     }
 
     private void dibujarCirculo(Graphics g) {
@@ -148,7 +150,7 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
 
         // Calcular y mostrar las coordenadas en el panel izquierdo
         // Dentro del método dibujarCirculo, después de calcular las aceleraciones
-// Calcular y mostrar las coordenadas en el panel izquierdo con 4 decimales
+        // Calcular y mostrar las coordenadas en el panel izquierdo con 4 decimales
         double posX = x - centerX;
         double posY = centerY - y;
         posX = Math.round(posX * 10000.0) / 10000.0; // Redondear a 4 decimales
@@ -156,12 +158,12 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
         posicionXLabel.setText("Posición en X: " + String.format("%.4f", posX));
         posicionYLabel.setText("Posición en Y: " + String.format("%.4f", posY));
 
-// Calcular velocidad tangencial con 4 decimales
+        // Calcular velocidad tangencial con 4 decimales
         double velocidadTangencial = radio * (2 * Math.PI / periodo);
         velocidadTangencial = Math.round(velocidadTangencial * 10000.0) / 10000.0; // Redondear a 4 decimales
         velocidadLabel.setText("Velocidad: " + String.format("%.4f", velocidadTangencial));
 
-// Calcular y mostrar la velocidad y sus componentes en el panel izquierdo con 4 decimales
+        // Calcular y mostrar la velocidad y sus componentes en el panel izquierdo con 4 decimales
         double velocidadX = velocidadTangencial * Math.cos(angle);
         double velocidadY = velocidadTangencial * Math.sin(angle);
         velocidadX = Math.round(velocidadX * 10000.0) / 10000.0; // Redondear a 4 decimales
@@ -169,12 +171,12 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
         velocidadXLabel.setText("Velocidad en X: " + String.format("%.4f", velocidadX));
         velocidadYLabel.setText("Velocidad en Y: " + String.format("%.4f", velocidadY));
 
-// Calcular aceleración tangencial con 4 decimales
+        // Calcular aceleración tangencial con 4 decimales
         double aceleracionTangencial = -radio * (Math.pow(omega, 2));
         aceleracionTangencial = Math.round(aceleracionTangencial * 10000.0) / 10000.0; // Redondear a 4 decimales
         aceleracionLabel.setText("Aceleración: " + String.format("%.4f", aceleracionTangencial));
 
-// Calcular y mostrar la aceleración y sus componentes en el panel izquierdo con 4 decimales
+        // Calcular y mostrar la aceleración y sus componentes en el panel izquierdo con 4 decimales
         double aceleracionX = -aceleracionTangencial * Math.cos(angle);
         double aceleracionY = aceleracionTangencial * Math.sin(angle);
         aceleracionX = Math.round(aceleracionX * 10000.0) / 10000.0; // Redondear a 4 decimales
@@ -182,19 +184,18 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
         aceleracionXLabel.setText("Aceleración en X: " + String.format("%.4f", aceleracionX));
         aceleracionYLabel.setText("Aceleración en Y: " + String.format("%.4f", aceleracionY));
 
-// Calcular la fuerza centrípeta con 4 decimales
+        // Calcular la fuerza centrípeta con 4 decimales
         double fuerzaCentripeta = (masa * Math.pow(velocidadTangencial, 2)) / radio;
         fuerzaCentripeta = Math.round(fuerzaCentripeta * 10000.0) / 10000.0; // Redondear a 4 decimales
         fuerzaCentripetaLabel.setText("Fuerza Centrípeta: " + String.format("%.4f", fuerzaCentripeta));
 
-// Calcular y mostrar las componentes de la fuerza en X y Y con 4 decimales
+        // Calcular y mostrar las componentes de la fuerza en X y Y con 4 decimales
         double fuerzaX = fuerzaCentripeta * Math.cos(angle);
         double fuerzaY = fuerzaCentripeta * Math.sin(angle);
         fuerzaX = Math.round(fuerzaX * 10000.0) / 10000.0; // Redondear a 4 decimales
         fuerzaY = Math.round(fuerzaY * 10000.0) / 10000.0; // Redondear a 4 decimales
         fuerzaXLabel.setText("Fuerza en X: " + String.format("%.4f", fuerzaX));
         fuerzaYLabel.setText("Fuerza en Y: " + String.format("%.4f", fuerzaY));
-
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -219,12 +220,6 @@ public class SimuladorMovimientoCircular extends JFrame implements ActionListene
             periodoField.setText("");
             masaField.setText("");
             timer.stop();
-        } else if (e.getSource() == opcionesComboBox) {
-            String selectedOption = (String) opcionesComboBox.getSelectedItem();
-            if (selectedOption.equals("Velocidad")) {
-                double velocidadTangencial = radio * (2 * Math.PI / periodo);
-                JOptionPane.showMessageDialog(this, "La velocidad tangencial es: " + velocidadTangencial);
-            }
         }
 
         if (e.getSource() == timer) {
